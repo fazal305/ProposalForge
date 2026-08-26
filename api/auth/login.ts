@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { prisma } from '../_lib/db'
-import { signAuthToken, verifyPassword, AUTH_COOKIE_NAME } from '../_lib/auth'
-import { sendError, sendServerError } from '../_lib/errors'
+import { prisma } from '../_lib/db.js'
+import { signAuthToken, verifyPassword, AUTH_COOKIE_NAME } from '../_lib/auth.js'
+import { sendError, sendServerError } from '../_lib/errors.js'
 
 /**
  * Single-user (ADMIN/OWNER) login. ProposalForge is a solo freelancer's workspace, not

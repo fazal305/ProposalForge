@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { sendError, sendServerError } from '../_lib/errors'
+import { sendError, sendServerError } from '../_lib/errors.js'
 
 /**
  * AI Quote Assistant — proxies a structured suggestion request to OpenRouter.

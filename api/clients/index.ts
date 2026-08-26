@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { z } from 'zod'
-import { prisma } from '../_lib/db'
-import { verifyAuthToken, AUTH_COOKIE_NAME } from '../_lib/auth'
-import { sendError, sendServerError } from '../_lib/errors'
+import { prisma } from '../_lib/db.js'
+import { verifyAuthToken, AUTH_COOKIE_NAME } from '../_lib/auth.js'
+import { sendError, sendServerError } from '../_lib/errors.js'
 
 /**
  * Reference implementation of the Clients REST endpoint against the Prisma schema.
@@ -38,7 +38,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST') {
       const parsed = createClientSchema.safeParse(req.body)
       if (!parsed.success) return sendError(res, 400, parsed.error.issues[0]?.message ?? 'Invalid input')
-      const client = await prisma.client.create({ data: { ...parsed.data, userId } })
+      const client = await prisma.client.create({
+        data: {
+          userId,
+          name: parsed.data.name,
+          company: parsed.data.company,
+          email: parsed.data.email,
+          phone: parsed.data.phone,
+          address: parsed.data.address,
+          notes: parsed.data.notes,
+        },
+      })
       return res.status(201).json(client)
     }
 

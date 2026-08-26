@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { prisma } from '../../_lib/db'
-import { sendError, sendServerError } from '../../_lib/errors'
+import { prisma } from '../../_lib/db.js'
+import { sendError, sendServerError } from '../../_lib/errors.js'
 
 /**
  * Public, unauthenticated read for the client-facing proposal view. Looks up by the
