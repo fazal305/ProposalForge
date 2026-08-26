@@ -1,0 +1,315 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth / profile ──────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  profile   DeveloperProfile?
+  clients   Client[]
+  templates ProposalTemplate[]
+  settings  Settings?
+  aiGenerations AiGeneration[]
+}
+
+model DeveloperProfile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+  title       String?
+  bio         String?
+  skills      String[]
+  experience  String?
+  portfolioUrl String?
+  githubUrl   String?
+  linkedinUrl String?
+  logoUrl     String?
+  hourlyRate  Decimal @default(0) @db.Decimal(10, 2)
+  currency    String  @default("USD")
+}
+
+model Settings {
+  id                   String @id @default(cuid())
+  userId               String @unique
+  user                 User   @relation(fields: [userId], references: [id])
+  proposalNumberPrefix String @default("Q-")
+  nextProposalNumber   Int    @default(1000)
+  defaultTermsJson     Json?
+}
+
+// ── Clients / projects ──────────────────────────────────────────
+
+model Client {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  company   String?
+  email     String?
+  phone     String?
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  projects Project[]
+
+  @@index([userId])
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+}
+
+model Project {
+  id                 String        @id @default(cuid())
+  clientId           String
+  client             Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  name               String
+  description        String?
+  problemStatement   String?
+  proposedSolution   String?
+  category           String?
+  techStack          String[]
+  estimatedTimeline  String?
+  budget             Decimal?      @db.Decimal(12, 2)
+  status             ProjectStatus @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime      @default(now())
+
+  proposals Proposal[]
+
+  @@index([clientId])
+}
+
+// ── Templates ──────────────────────────────────────────────────
+
+model ProposalTemplate {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  theme       Json     @default("{}")
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sections  TemplateSection[]
+  proposals Proposal[]
+
+  @@index([userId])
+}
+
+enum SectionType {
+  STATIC
+  DYNAMIC
+}
+
+model TemplateSection {
+  id         String            @id @default(cuid())
+  templateId String
+  template   ProposalTemplate  @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  key        String
+  title      String
+  type       SectionType
+  contentMd  String            @default("")
+  orderIndex Int
+  enabled    Boolean           @default(true)
+
+  @@index([templateId])
+}
+
+// ── Proposals ──────────────────────────────────────────────────
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  CHANGES_REQUESTED
+  APPROVED
+  REJECTED
+  EXPIRED
+  ARCHIVED
+}
+
+model Proposal {
+  id             String         @id @default(cuid())
+  projectId      String
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  templateId     String
+  template       ProposalTemplate @relation(fields: [templateId], references: [id])
+  number         String         @unique
+  status         ProposalStatus @default(DRAFT)
+  publicToken    String         @unique @default(cuid())
+  currency       String         @default("USD")
+  subtotal       Decimal        @default(0) @db.Decimal(12, 2)
+  discount       Decimal        @default(0) @db.Decimal(12, 2)
+  tax            Decimal        @default(0) @db.Decimal(12, 2)
+  total          Decimal        @default(0) @db.Decimal(12, 2)
+  validUntil     DateTime?
+  currentVersion Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  sentAt         DateTime?
+  viewedAt       DateTime?
+
+  sections         ProposalSection[]
+  scopeItems       ScopeItem[]
+  milestones       Milestone[]
+  pricingItems     PricingItem[]
+  paymentSchedules PaymentSchedule[]
+  versions         ProposalVersion[]
+  views            ProposalView[]
+  approvals        ProposalApproval[]
+  activity         ActivityLog[]
+
+  @@index([status])
+  @@index([projectId])
+}
+
+model ProposalVersion {
+  id            String   @id @default(cuid())
+  proposalId    String
+  proposal      Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  snapshotJson  Json
+  createdAt     DateTime @default(now())
+
+  @@unique([proposalId, versionNumber])
+}
+
+model ProposalSection {
+  id         String   @id @default(cuid())
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  sectionKey String
+  title      String
+  contentMd  String   @default("")
+  orderIndex Int
+
+  @@index([proposalId])
+}
+
+model ScopeItem {
+  id          String  @id @default(cuid())
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  groupTitle  String
+  title       String
+  description String?
+  quantity    Decimal @default(1) @db.Decimal(10, 2)
+  unit        String  @default("item")
+  unitPrice   Decimal? @db.Decimal(12, 2)
+  notes       String?
+  included    Boolean @default(true)
+  orderIndex  Int
+
+  @@index([proposalId])
+}
+
+model Milestone {
+  id             String    @id @default(cuid())
+  proposalId     String
+  proposal       Proposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  startDate      DateTime?
+  endDate        DateTime?
+  durationLabel  String?
+  paymentPercent Decimal?  @db.Decimal(5, 2)
+  orderIndex     Int
+
+  @@index([proposalId])
+}
+
+model PricingItem {
+  id          String  @id @default(cuid())
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  quantity    Decimal @default(1) @db.Decimal(10, 2)
+  unitPrice   Decimal @default(0) @db.Decimal(12, 2)
+  orderIndex  Int
+
+  @@index([proposalId])
+}
+
+model PaymentSchedule {
+  id         String   @id @default(cuid())
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  label      String
+  percent    Decimal  @db.Decimal(5, 2)
+  amount     Decimal  @db.Decimal(12, 2)
+  dueOn      String?
+  orderIndex Int
+
+  @@index([proposalId])
+}
+
+// ── Sharing / approval ────────────────────────────────────────
+
+model ProposalView {
+  id         String   @id @default(cuid())
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  viewedAt   DateTime @default(now())
+  ipHash     String?
+  userAgent  String?
+
+  @@index([proposalId])
+}
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+model ProposalApproval {
+  id         String            @id @default(cuid())
+  proposalId String
+  proposal   Proposal          @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  decision   ApprovalDecision
+  clientName String
+  comment    String?
+  decidedAt  DateTime          @default(now())
+
+  @@index([proposalId])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  type       String
+  message    String
+  createdAt  DateTime @default(now())
+
+  @@index([proposalId])
+}
+
+// ── AI ────────────────────────────────────────────────────────
+
+model AiGeneration {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  prompt           String
+  rawResponseJson  Json
+  createdAt        DateTime @default(now())
+}
