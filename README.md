@@ -57,16 +57,16 @@ src/
     proposals/    ScopeBuilder, PricingBuilder, TimelineBuilder, PaymentScheduleBuilder,
                    SectionsEditor, ProposalRenderer (screen), ProposalPdfDocument (PDF)
   stores/         Zustand stores — clients, projects, templates, proposals, settings, sync
-  lib/            pure logic: pricing.ts, variables.ts, markdownLite.tsx, generateLogo.ts
+  lib/            pure logic: pricing.js, variables.js, markdownLite.jsx, generateLogo.js
   data/           seed data: default template, terms library, process phases, demo data
   schemas/        Zod validation schemas
-  types/          shared TypeScript domain types
+  constants.js    shared display constants (e.g. proposal status labels)
 
 api/              Vercel serverless functions (Prisma-backed reference implementation)
-  _lib/           db.ts (Prisma client), auth.ts (bcrypt + JWT), errors.ts
+  _lib/           db.js (Prisma client), auth.js (bcrypt + JWT), errors.js
   clients/        example CRUD route
-  public/proposals/[token].ts   public token-based read + view tracking
-  ai/quote.ts     OpenRouter proxy (key stays server-side)
+  public/proposals/[token].js   public token-based read + view tracking
+  ai/quote.js     OpenRouter proxy (key stays server-side)
 
 prisma/schema.prisma   full relational schema (users, clients, projects, templates,
                         proposals + versions/sections/scope/pricing/milestones/payment
@@ -83,35 +83,35 @@ was a deliberate scope decision for this build, not a shortcut hidden from the u
 - The brief explicitly asks for offline-first draft protection — local persistence
   satisfies that directly.
 - The complete relational schema (`prisma/schema.prisma`) and a handful of reference API
-  routes are written and type-check cleanly, so wiring the frontend to the real backend is
-  a contained follow-up: swap the Zustand actions for TanStack Query calls against `/api/*`,
+  routes are written and build cleanly, so wiring the frontend to the real backend is a
+  contained follow-up: swap the Zustand actions for TanStack Query calls against `/api/*`,
   point `DATABASE_URL` at a real Postgres instance, run `npx prisma migrate dev`.
 
 ### Variable system
 
-`src/lib/variables.ts` resolves `{{client.name}}`, `{{project.total}}`,
+`src/lib/variables.js` resolves `{{client.name}}`, `{{project.total}}`,
 `{{developer.email}}`, `{{proposal.number}}`, etc. against a `VariableContext` built per
 proposal. Unresolved variables render as `[namespace.field]` rather than silently
 disappearing, so a missing value is always visible before a proposal is sent.
 
 ### Pricing & payment-schedule math
 
-All calculation lives in `src/lib/pricing.ts`, is framework-free, and is unit tested
-(`src/lib/pricing.test.ts`). Totals are **always computed**, never typed in directly. Tax
+All calculation lives in `src/lib/pricing.js`, is framework-free, and is unit tested
+(`src/lib/pricing.test.js`). Totals are **always computed**, never typed in directly. Tax
 is calculated on the post-discount amount. Payment-schedule percentages are converted to
 amounts with the rounding remainder absorbed into the final entry so the parts always sum
 exactly to the total.
 
 ## Tech stack
 
-**Frontend** — React 19, Vite, TypeScript, React Router, Tailwind CSS v4, Zustand,
+**Frontend** — React 19, Vite, JavaScript (JSX), React Router, Tailwind CSS v4, Zustand,
 TanStack Query (installed, ready for the live-API swap), React Hook Form + Zod,
 `@react-pdf/renderer` (lazy-loaded), Recharts (installed for future chart use).
 
-**Backend (reference implementation)** — Vercel serverless functions, TypeScript, Prisma
+**Backend (reference implementation)** — Vercel serverless functions, JavaScript, Prisma
 ORM, PostgreSQL, bcryptjs + jsonwebtoken.
 
-**AI** — OpenRouter, called only from `api/ai/quote.ts`; the key never reaches the browser.
+**AI** — OpenRouter, called only from `api/ai/quote.js`; the key never reaches the browser.
 
 **Testing** — Vitest + jsdom.
 
@@ -121,7 +121,7 @@ ORM, PostgreSQL, bcryptjs + jsonwebtoken.
 npm install
 npm run dev       # http://localhost:5173
 npm run test      # unit tests (pricing, variables, proposal store)
-npm run build     # type-check + production build
+npm run build     # production build
 ```
 
 No environment variables are required to run the app as shipped — it works entirely
@@ -142,7 +142,7 @@ cp .env.example .env
 ### AI configuration
 
 This is an **educational project — no OpenRouter API key is provided**. The AI Quote
-Assistant architecture (`api/ai/quote.ts`) is written and validated, but inert until you
+Assistant architecture (`api/ai/quote.js`) is written and validated, but inert until you
 supply your own key:
 
 1. Get a key at [openrouter.ai/keys](https://openrouter.ai/keys).
