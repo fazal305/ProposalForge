@@ -8,6 +8,10 @@ document from scratch every time.
 > Educational / portfolio project. Terms & Conditions content is a reusable business
 > template, not legal advice — see the note in Settings → Terms Library.
 
+## Live Demo
+
+**[proposalforge-psi.vercel.app](https://proposalforge-psi.vercel.app)**
+
 ## Product overview
 
 The core workflow: **Client → Project → Proposal (from Template) → Scope → Pricing →
