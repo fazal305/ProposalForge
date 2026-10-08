@@ -26,3 +26,7 @@ Open an issue describing the feature and why it'd be useful. Not every suggestio
 ## Code of Conduct
 
 This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). Please be respectful in all interactions.
+
+## Contributor License Agreement
+
+This project is licensed under the PolyForm Noncommercial License 1.0.0, with paid commercial licenses available from the maintainer. Contributions are accepted only under the [Contributor License Agreement](CLA.md), which lets the maintainer relicense and sell them. Pull requests are merged only after you have agreed to it in the pull request template.

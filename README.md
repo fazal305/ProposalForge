@@ -196,3 +196,11 @@ Two separate, required steps — pushing to GitHub is **not** the same as deploy
 - AI Quote Assistant frontend (structured suggestions → editable pricing draft).
 - Pointer-based drag-and-drop reordering.
 - Additional pre-authored theme presets (Executive, Modern, Technical, Editorial).
+
+## License
+
+Free for personal, educational, and noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+
+Commercial use requires a paid commercial license. Contact fazalabbas2002@gmail.com.
+
+Versions up to and including `last-mit` were released under the MIT License and remain available under MIT.

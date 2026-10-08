@@ -21,3 +21,7 @@ Before / after screenshots help a lot for visual changes.
 - [ ] My code follows the existing style of this project
 - [ ] I've tested my changes
 - [ ] I've updated documentation if needed
+
+## Contributor License Agreement
+
+- [ ] I have read `CLA.md` (in the repository root) and agree to its terms for this contribution.
