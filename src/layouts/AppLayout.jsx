@@ -107,7 +107,7 @@ export function AppLayout() {
       </main>
 
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-surface)] border-t border-[var(--color-border)] flex justify-around py-[var(--spacing-2xs)]"
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-surface)] border-t border-[var(--color-border)] flex overflow-x-auto py-[var(--spacing-2xs)]"
         aria-label="Main navigation"
       >
         {NAV_ITEMS.map((item) => (
@@ -117,7 +117,7 @@ export function AppLayout() {
             end={item.end}
             className={({ isActive }) =>
               clsx(
-                'text-[var(--text-xs)] px-[var(--spacing-xs)] py-[var(--spacing-2xs)] rounded-[var(--radius-sm)]',
+                'shrink-0 text-[var(--text-xs)] px-[var(--spacing-sm)] py-[var(--spacing-2xs)] rounded-[var(--radius-sm)]',
                 isActive ? 'text-[var(--color-primary)] font-medium' : 'text-[var(--color-text-muted)]',
               )
             }
