@@ -12,7 +12,7 @@ export const DEFAULT_DEVELOPER_PROFILE = {
   location: 'Karachi, Pakistan',
   portfolioUrl: 'https://fazal.is-a.dev/',
   githubUrl: 'https://github.com/fazal305',
-  linkedinUrl: 'https://pk.linkedin.com/in/fazal-abbas-4653dg86',
+  linkedinUrl: 'https://www.linkedin.com/in/fazal-abbas879/',
   bio: '[YOUR BIO — a few sentences about your experience, focus areas, and what makes you the right developer for this project.]',
   skills: ['[YOUR SKILL 1]', '[YOUR SKILL 2]', '[YOUR SKILL 3]'],
   experience: '[YOUR YEARS OF EXPERIENCE / BACKGROUND SUMMARY]',
